@@ -5,7 +5,7 @@ A modern, responsive research paper website presenting my Machine Learning capst
 ## 🌐 Live Demo
 
 **Research Paper:**  
-https://ahmedalii-portfolio.vercel.app/flyrank-paper
+https://ahmedali2155.github.io/flyrank-paper/
 
 ## 📚 Overview
 
