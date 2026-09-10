@@ -1,0 +1,1137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>
+    Predicting Content Click Opportunities Using Google Search Console Performance Data
+  </title>
+
+  <meta
+    name="description"
+    content="Research paper by Ahmed Ali completed during the FlyRank Machine Learning Internship."
+  />
+
+  <meta
+    name="keywords"
+    content="Machine Learning, SEO, Google Search Console, FlyRank, Random Forest, Research Paper"
+  />
+
+  <meta name="author" content="Ahmed Ali" />
+
+  <meta property="og:title"
+        content="Predicting Content Click Opportunities Using Google Search Console Performance Data" />
+
+  <meta property="og:type" content="article" />
+
+  <meta property="og:description"
+        content="Research paper completed during the FlyRank Machine Learning Internship." />
+
+  <meta property="og:url"
+        content="https://ahmedali2155.github.io/flyrank-paper/" />
+
+  <meta property="og:site_name" content="FlyRank Research Paper" />
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+
+<header class="hero">
+
+    <div class="hero-content">
+
+        <span class="badge">
+            FlyRank Machine Learning Internship
+        </span>
+
+        <h1>
+            Predicting Content Click Opportunities Using
+            Google Search Console Performance Data
+        </h1>
+
+        <p class="subtitle">
+            A Machine Learning Research Paper
+        </p>
+
+        <div class="author-box">
+
+            <p><strong>Author:</strong> Ahmed Ali</p>
+
+            <p><strong>Program:</strong> FlyRank Machine Learning Internship</p>
+
+            <p><strong>Published:</strong> September 2026</p>
+
+        </div>
+
+    </div>
+
+</header>
+
+<nav class="toc">
+
+<h2>Table of Contents</h2>
+
+<ul>
+
+<li><a href="#abstract">Abstract</a></li>
+
+<li><a href="#question">Research Question</a></li>
+
+<li><a href="#introduction">Introduction</a></li>
+
+<li><a href="#data">Data</a></li>
+
+<li><a href="#methodology">Methodology</a></li>
+
+<li><a href="#results">Results</a></li>
+
+<li><a href="#limitations">Limitations</a></li>
+
+<li><a href="#recommendations">Ranked Recommendations</a></li>
+
+<li><a href="#reproducibility">Reproducibility</a></li>
+
+<li><a href="#acknowledgments">Acknowledgments & Data Credit</a></li>
+
+<li><a href="#conclusion">Conclusion</a></li>
+
+</ul>
+
+</nav>
+
+<main class="container">
+    <!-- ========================= ABSTRACT ========================= -->
+
+<section id="abstract" class="paper-section">
+
+    <h2>Abstract</h2>
+
+    <p>
+        This research investigates whether Google Search Console performance
+        metrics can be used to identify content that is more likely to receive
+        clicks. The analysis was conducted using the FlyRank ML Internship
+        dataset containing anonymized search performance data from the March
+        2026 release. A Random Forest Classifier was trained using search
+        impressions and aggregate search position and compared with a simple
+        rule-based baseline under consistent evaluation settings. The model was
+        further evaluated using grouped validation by client together with a
+        feature leakage audit to improve the reliability of the reported
+        results. The findings provide observed and directional evidence that
+        machine learning can support content optimization decisions while
+        emphasizing that the model should be used as a decision-support tool
+        rather than a fully automated decision-making system.
+    </p>
+
+</section>
+
+<!-- ========================= RESEARCH QUESTION ========================= -->
+
+<section id="question" class="paper-section">
+
+    <h2>Research Question</h2>
+
+    <blockquote>
+
+        Can Google Search Console performance metrics be used to identify
+        content with a higher likelihood of receiving clicks and support
+        content optimization decisions?
+
+    </blockquote>
+
+</section>
+
+<!-- ========================= INTRODUCTION ========================= -->
+
+<section id="introduction" class="paper-section">
+
+    <h2>Introduction</h2>
+
+    <p>
+        Content teams often manage thousands of webpages while having limited
+        time to review every page manually. Prioritizing which pages deserve
+        optimization is therefore an important but challenging task. Google
+        Search Console provides search performance metrics that may help content
+        teams identify opportunities more efficiently.
+    </p>
+
+    <p>
+        The objective of this project is to evaluate whether a machine learning
+        model can use publicly safe search performance features to predict
+        whether a page is likely to receive search clicks. A Random Forest
+        Classifier is compared with a simple rule-based baseline using the same
+        evaluation settings to provide a fair comparison.
+    </p>
+
+    <p>
+        To improve the credibility of the results, the project includes grouped
+        validation based on <strong>client_hash_id</strong>, a feature leakage
+        audit, and careful interpretation of performance metrics. These
+        validation steps help reduce overly optimistic evaluation and encourage
+        responsible reporting of machine learning results.
+    </p>
+
+    <p>
+        The final outcome is a practical content action playbook that ranks
+        optimization opportunities using measured model outputs. The
+        recommendations are intended to assist human reviewers in making better
+        content decisions and should be interpreted as observed evidence on the
+        evaluated dataset rather than proof of future performance.
+    </p>
+
+</section>
+
+<!-- ========================= DATA ========================= -->
+
+<section id="data" class="paper-section">
+
+    <h2>Data</h2>
+
+    <h3>Dataset</h3>
+
+    <p>
+        This project uses the <strong>FlyRank ML Internship dataset</strong>,
+        which contains anonymized Google Search Console performance data from
+        real-world websites. The analysis focuses on the
+        <strong>March 2026</strong> data release.
+    </p>
+
+    <p>
+        The dataset was accessed directly from the FlyRank Hugging Face
+        repository using DuckDB, allowing efficient querying without
+        downloading the complete dataset locally.
+    </p>
+
+    <h3>Dataset Summary</h3>
+
+    <table>
+
+        <tr>
+            <th>Item</th>
+            <th>Value</th>
+        </tr>
+
+        <tr>
+            <td>Dataset</td>
+            <td>FlyRank ML Internship Dataset</td>
+        </tr>
+
+        <tr>
+            <td>Platform</td>
+            <td>Hugging Face</td>
+        </tr>
+
+        <tr>
+            <td>Storage Format</td>
+            <td>Apache Parquet</td>
+        </tr>
+
+        <tr>
+            <td>Query Engine</td>
+            <td>DuckDB</td>
+        </tr>
+
+        <tr>
+            <td>Programming Language</td>
+            <td>Python</td>
+        </tr>
+
+        <tr>
+            <td>Environment</td>
+            <td>Google Colab</td>
+        </tr>
+
+        <tr>
+            <td>Records Used</td>
+            <td>Approximately 100,000</td>
+        </tr>
+
+        <tr>
+            <td>Time Window</td>
+            <td>March 2026</td>
+        </tr>
+
+    </table>
+
+    <h3>Features Used</h3>
+
+    <table>
+
+        <tr>
+            <th>Feature</th>
+            <th>Description</th>
+        </tr>
+
+        <tr>
+            <td>gsc_impressions</td>
+            <td>Number of times a page appeared in Google Search results.</td>
+        </tr>
+
+        <tr>
+            <td>gsc_sum_position</td>
+            <td>Aggregate search position of the page.</td>
+        </tr>
+
+        <tr>
+            <td>high_clicks</td>
+            <td>Binary prediction target where gsc_clicks &gt; 0.</td>
+        </tr>
+
+    </table>
+
+    <h3>Data Preparation</h3>
+
+    <ul>
+
+        <li>Loaded approximately 100,000 records from the March 2026 dataset.</li>
+
+        <li>Created a binary target variable named <strong>high_clicks</strong>.</li>
+
+        <li>Selected only publicly safe search performance features.</li>
+
+        <li>Removed unnecessary columns from model training.</li>
+
+        <li>Verified the selected features before training.</li>
+
+    </ul>
+
+    <h3>Public Safety</h3>
+
+    <p>
+        To protect privacy and comply with the internship requirements,
+        the following information was excluded throughout this project:
+    </p>
+
+    <ul>
+
+        <li>Client names</li>
+
+        <li>Website domains</li>
+
+        <li>URLs</li>
+
+        <li>Search queries</li>
+
+        <li>Credentials</li>
+
+        <li>Personally identifiable information (PII)</li>
+
+    </ul>
+
+    <p>
+        Only anonymized identifiers and aggregated search performance metrics
+        were used during this research.
+    </p>
+
+</section>
+
+<!-- ========================= METHODOLOGY ========================= -->
+
+<section id="methodology" class="paper-section">
+
+    <h2>Methodology</h2>
+
+    <h3>Objective</h3>
+
+    <p>
+        The objective of this project is to evaluate whether Google Search
+        Console performance metrics can be used to identify content that is more
+        likely to receive search clicks. The model is intended to support
+        content optimization decisions rather than replace human judgment.
+    </p>
+
+    <h3>Prediction Target</h3>
+
+    <p>
+        The prediction target is a binary variable named
+        <strong>high_clicks</strong>.
+    </p>
+
+    <table>
+
+        <tr>
+            <th>Target Value</th>
+            <th>Definition</th>
+        </tr>
+
+        <tr>
+            <td>1</td>
+            <td>Page received at least one search click (gsc_clicks &gt; 0)</td>
+        </tr>
+
+        <tr>
+            <td>0</td>
+            <td>Page received no search clicks</td>
+        </tr>
+
+    </table>
+
+    <h3>Input Features</h3>
+
+    <table>
+
+        <tr>
+            <th>Feature</th>
+            <th>Purpose</th>
+        </tr>
+
+        <tr>
+            <td>gsc_impressions</td>
+            <td>Measures how frequently a page appeared in Google Search.</td>
+        </tr>
+
+        <tr>
+            <td>gsc_sum_position</td>
+            <td>Represents the page's aggregate search position.</td>
+        </tr>
+
+    </table>
+
+    <h3>Baseline</h3>
+
+    <p>
+        Before training a machine learning model, a simple rule-based baseline
+        was created using manually defined thresholds. The Random Forest model
+        was evaluated against the baseline using the same evaluation settings so
+        that the comparison remained fair and consistent.
+    </p>
+
+    <h3>Machine Learning Model</h3>
+
+    <p>
+        A <strong>Random Forest Classifier</strong> from Scikit-learn was
+        selected because it performs well on structured tabular datasets,
+        captures non-linear relationships, requires minimal preprocessing, and
+        provides feature importance estimates that improve interpretability.
+    </p>
+
+    <h3>Validation Strategy</h3>
+
+    <table>
+
+        <tr>
+            <th>Project Stage</th>
+            <th>Validation Method</th>
+        </tr>
+
+        <tr>
+            <td>Week 5</td>
+            <td>Random Train/Test Split (80/20)</td>
+        </tr>
+
+        <tr>
+            <td>Week 6</td>
+            <td>Grouped Validation using client_hash_id</td>
+        </tr>
+
+    </table>
+
+    <p>
+        Grouped validation prevents records from the same client appearing in
+        both the training and testing sets, providing a more realistic estimate
+        of model performance on previously unseen clients.
+    </p>
+
+    <h3>Leakage Audit</h3>
+
+    <ul>
+
+        <li>gsc_clicks was used only to create the target label.</li>
+
+        <li>No future information was included during training.</li>
+
+        <li>No label-derived features were used as model inputs.</li>
+
+        <li>client_hash_id was used only for grouped validation and never as a predictive feature.</li>
+
+    </ul>
+
+    <h3>Evaluation Metrics</h3>
+
+    <p>
+        Model performance was evaluated using Accuracy, Precision, Recall,
+        F1-score, and the Classification Report. These metrics were used
+        consistently throughout the project to compare the baseline and the
+        Random Forest model under the same evaluation conditions.
+    </p>
+
+    <h3>Reproducibility</h3>
+
+    <p>
+        The complete workflow was implemented in Python using Google Colab,
+        DuckDB, Pandas, and Scikit-learn. Fixed random seeds were used where
+        appropriate to improve reproducibility of the reported results.
+    </p>
+
+</section>
+
+<!-- ========================= RESULTS ========================= -->
+
+<section id="results" class="paper-section">
+
+    <h2>Results</h2>
+
+    <h3>Model Performance</h3>
+
+    <p>
+        The Random Forest Classifier was evaluated using the same dataset as the
+        Week 4 rule-based baseline. Performance was measured using standard
+        classification metrics and later re-evaluated using grouped validation
+        to provide a more realistic estimate of model generalization.
+    </p>
+
+    <h3>Performance Summary</h3>
+
+    <table>
+
+        <tr>
+            <th>Model</th>
+            <th>Validation Method</th>
+            <th>Accuracy</th>
+        </tr>
+
+        <tr>
+            <td>Rule-Based Baseline</td>
+            <td>Random Split</td>
+            <td>See Week 4 baseline notebook</td>
+        </tr>
+
+        <tr>
+            <td>Random Forest</td>
+            <td>Random Split</td>
+            <td><strong>94.13%</strong></td>
+        </tr>
+
+        <tr>
+            <td>Random Forest</td>
+            <td>Grouped Split</td>
+            <td><strong>95.63%</strong></td>
+        </tr>
+
+    </table>
+
+    <p>
+        Grouped validation produced a similar level of performance while
+        ensuring that data from the same client did not appear in both the
+        training and testing sets. This provides a stronger estimate of model
+        performance on previously unseen clients.
+    </p>
+
+    <h3>Classification Performance</h3>
+
+    <table>
+
+        <tr>
+            <th>Metric</th>
+            <th>Class 0</th>
+            <th>Class 1</th>
+        </tr>
+
+        <tr>
+            <td>Precision</td>
+            <td>0.98</td>
+            <td>0.43</td>
+        </tr>
+
+        <tr>
+            <td>Recall</td>
+            <td>0.98</td>
+            <td>0.41</td>
+        </tr>
+
+        <tr>
+            <td>F1-score</td>
+            <td>0.98</td>
+            <td>0.42</td>
+        </tr>
+
+    </table>
+
+    <p>
+        <strong>Overall Accuracy:</strong> 95.63%
+    </p>
+
+    <p>
+        Although the overall accuracy is high, the model performs less
+        effectively on the positive class (<strong>high_clicks = 1</strong>).
+        This is likely due to class imbalance, where most content items belong
+        to the negative class.
+    </p>
+
+    <h3>Feature Importance</h3>
+
+    <table>
+
+        <tr>
+            <th>Feature</th>
+            <th>Importance</th>
+        </tr>
+
+        <tr>
+            <td>gsc_sum_position</td>
+            <td><strong>0.5492</strong></td>
+        </tr>
+
+        <tr>
+            <td>gsc_impressions</td>
+            <td><strong>0.4508</strong></td>
+        </tr>
+
+    </table>
+
+    <p>
+        The model indicates that search position contributed slightly more than
+        search impressions when predicting whether a page would receive clicks.
+    </p>
+
+    <h3>Interpretation</h3>
+
+    <p>
+        The Random Forest model achieved higher measured performance than the
+        Week 4 rule-based baseline under the evaluation settings used in this
+        project.
+    </p>
+
+    <p>
+        Grouped validation increased confidence that the evaluation was not
+        overly optimistic by preventing data from the same client appearing in
+        both the training and testing sets.
+    </p>
+
+    <p>
+        Feature importance analysis suggests that both search position and
+        impressions provide meaningful predictive information. These findings
+        should be interpreted as measured associations rather than evidence of
+        causal relationships.
+    </p>
+
+    <h3>Visualizations</h3>
+
+    <p>
+        The following figures accompany this research paper:
+    </p>
+
+    <ul>
+
+        <li>Model vs Baseline comparison</li>
+
+        <li>Feature Importance chart</li>
+
+        <li>Ranked Content Action Queue</li>
+
+    </ul>
+
+</section>
+
+<!-- ========================= LIMITATIONS ========================= -->
+
+<section id="limitations" class="paper-section">
+
+    <h2>Limitations & Honest Framing</h2>
+
+    <h3>Study Limitations</h3>
+
+    <p>
+        This project was developed as a machine learning case study using the
+        FlyRank ML Internship dataset. Although the Random Forest model achieved
+        strong measured performance on the evaluated dataset, several important
+        limitations should be considered when interpreting the results.
+    </p>
+
+    <h3>Limited Feature Set</h3>
+
+    <p>
+        The model was trained using only two Google Search Console performance
+        features:
+    </p>
+
+    <ul>
+        <li><strong>gsc_impressions</strong></li>
+        <li><strong>gsc_sum_position</strong></li>
+    </ul>
+
+    <p>
+        Other factors—including content quality, search intent, page authority,
+        metadata quality, competition, and user behavior—may also influence
+        whether a page receives clicks. These factors were outside the scope of
+        this study.
+    </p>
+
+    <h3>Dataset Scope</h3>
+
+    <p>
+        The analysis was performed using approximately 100,000 records from the
+        March 2026 FlyRank ML Internship dataset. The findings therefore
+        represent observations from this specific data release and should not be
+        interpreted as representative of every website, client, or future search
+        environment.
+    </p>
+
+    <h3>Class Imbalance</h3>
+
+    <p>
+        Most records belong to the negative class, resulting in an imbalanced
+        classification problem. Consequently, overall accuracy is high while
+        precision and recall for the positive class remain lower. This should be
+        considered when interpreting model performance.
+    </p>
+
+    <h3>Validation</h3>
+
+    <p>
+        Grouped validation using <strong>client_hash_id</strong> was performed
+        to reduce optimistic evaluation caused by the same client appearing in
+        both the training and testing sets. Although this provides a stronger
+        estimate of generalization than a simple random split, additional
+        time-based validation would further strengthen the evaluation.
+    </p>
+
+    <h3>Honest Claim Framing</h3>
+
+    <p>
+        The findings presented in this paper should be interpreted as
+        <strong>observed</strong>, <strong>measured</strong>, and
+        <strong>directional</strong> evidence within the evaluated dataset.
+        They should not be interpreted as proof of causal relationships or as
+        evidence of Google's ranking algorithm.
+    </p>
+
+    <p>
+        The model is intended as a
+        <strong>decision-support tool</strong> rather than a fully automated
+        decision-making system. Human review remains necessary before acting on
+        any recommendation produced by the model.
+    </p>
+
+    <h3>Future Improvements</h3>
+
+    <ul>
+
+        <li>Include additional search and engagement features.</li>
+
+        <li>Evaluate multiple machine learning algorithms.</li>
+
+        <li>Perform time-aware validation using future datasets.</li>
+
+        <li>Address class imbalance using resampling techniques.</li>
+
+        <li>Explore feature engineering and hyperparameter tuning.</li>
+
+        <li>Evaluate performance across longer historical periods.</li>
+
+    </ul>
+
+</section>
+
+<!-- ========================= RANKED RECOMMENDATIONS ========================= -->
+
+<section id="recommendations" class="paper-section">
+
+    <h2>Ranked Recommendations</h2>
+
+    <p>
+        The objective of this project is not only to build a prediction model
+        but also to convert model outputs into practical recommendations that
+        can assist content teams in prioritizing optimization work.
+    </p>
+
+    <p>
+        These recommendations are intended as
+        <strong>decision-support guidance</strong> and should always be reviewed
+        by a human before implementation.
+    </p>
+
+    <h3>Ranked Content Actions</h3>
+
+    <table>
+
+        <tr>
+            <th>Priority</th>
+            <th>Content Condition</th>
+            <th>Recommended Action</th>
+            <th>Reason Code</th>
+        </tr>
+
+        <tr>
+            <td>High</td>
+            <td>High impressions with very low CTR</td>
+            <td>Improve page title and meta description</td>
+            <td>LOW_CTR_HIGH_IMPRESSIONS</td>
+        </tr>
+
+        <tr>
+            <td>High</td>
+            <td>Good ranking position but few clicks</td>
+            <td>Review search intent and improve content relevance</td>
+            <td>GOOD_POSITION_LOW_CLICKS</td>
+        </tr>
+
+        <tr>
+            <td>Medium</td>
+            <td>Moderate impressions with declining performance</td>
+            <td>Refresh outdated content</td>
+            <td>CONTENT_REFRESH</td>
+        </tr>
+
+        <tr>
+            <td>Medium</td>
+            <td>Low impressions and poor ranking</td>
+            <td>Improve on-page SEO and internal linking</td>
+            <td>LOW_VISIBILITY</td>
+        </tr>
+
+        <tr>
+            <td>Low</td>
+            <td>Stable performance</td>
+            <td>Continue monitoring</td>
+            <td>MONITOR_ONLY</td>
+        </tr>
+
+    </table>
+
+    <h3>Archetype → Action Mapping</h3>
+
+    <table>
+
+        <tr>
+            <th>Content Archetype</th>
+            <th>Recommended Action</th>
+        </tr>
+
+        <tr>
+            <td>High Visibility + Low CTR</td>
+            <td>Improve metadata and SERP appearance</td>
+        </tr>
+
+        <tr>
+            <td>Good Ranking + Low Engagement</td>
+            <td>Improve content quality and search intent alignment</td>
+        </tr>
+
+        <tr>
+            <td>Declining Performance</td>
+            <td>Refresh existing content</td>
+        </tr>
+
+        <tr>
+            <td>Low Visibility</td>
+            <td>Improve SEO fundamentals and internal linking</td>
+        </tr>
+
+        <tr>
+            <td>Stable High Performer</td>
+            <td>Protect existing content and continue monitoring</td>
+        </tr>
+
+    </table>
+
+    <h3>Intended Use</h3>
+
+    <ul>
+
+        <li>Prioritize pages for manual review.</li>
+
+        <li>Support SEO decision-making.</li>
+
+        <li>Identify content refresh opportunities.</li>
+
+        <li>Organize optimization work using measurable signals.</li>
+
+    </ul>
+
+    <p>
+        The recommendations are not intended to automatically publish content
+        changes or replace editorial judgment.
+    </p>
+
+    <h3>Human Review Rules</h3>
+
+    <ul>
+
+        <li>Verify content quality.</li>
+
+        <li>Review search intent alignment.</li>
+
+        <li>Consider business priorities.</li>
+
+        <li>Review technical SEO considerations.</li>
+
+        <li>Maintain editorial standards.</li>
+
+    </ul>
+
+    <h3>Actions That Should NOT Be Automated</h3>
+
+    <ul>
+
+        <li>Publishing rewritten content.</li>
+
+        <li>Deleting pages.</li>
+
+        <li>Changing URLs.</li>
+
+        <li>Creating redirects.</li>
+
+        <li>Changing website structure.</li>
+
+        <li>Updating metadata without review.</li>
+
+    </ul>
+
+    <h3>Cost vs Value</h3>
+
+    <p>
+        The highest-value opportunities are pages with strong visibility but low
+        click-through rates because relatively small improvements may generate
+        meaningful traffic gains. Lower-priority opportunities should be
+        addressed after higher-impact pages have been reviewed.
+    </p>
+
+    <h3>Monitoring & Retraining</h3>
+
+    <ul>
+
+        <li>Monitor prediction quality over time.</li>
+
+        <li>Retrain when new monthly data becomes available.</li>
+
+        <li>Retrain if search behavior changes significantly.</li>
+
+        <li>Review performance if accuracy decreases.</li>
+
+        <li>Add new search performance features when appropriate.</li>
+
+    </ul>
+
+    <h3>Conclusion</h3>
+
+    <p>
+        The action playbook converts machine learning predictions into practical
+        content optimization recommendations while maintaining careful claim
+        language and human oversight. All recommendations should be interpreted
+        as <strong>observed</strong>, <strong>measured</strong>, and
+        <strong>directional</strong> evidence based on the evaluated dataset.
+    </p>
+
+</section>
+
+<!-- ========================= REPRODUCIBILITY ========================= -->
+
+<section id="reproducibility" class="paper-section">
+
+    <h2>Reproducibility</h2>
+
+    <p>
+        This project follows a reproducible machine learning workflow. Every
+        stage of the analysis—including data loading, preprocessing, model
+        training, validation, evaluation, and action generation—is documented
+        within Jupyter notebooks available in the project repository.
+    </p>
+
+    <h3>GitHub Repository</h3>
+
+    <p>
+        The complete source code, notebooks, and supporting documentation are
+        available on GitHub:
+    </p>
+
+    <p>
+        <a
+            href="https://github.com/ahmedali2155/flyrank-ml-internship"
+            target="_blank"
+            rel="noopener noreferrer">
+            github.com/ahmedali2155/flyrank-ml-internship
+        </a>
+    </p>
+
+    <h3>Project Notebooks</h3>
+
+    <table>
+
+        <tr>
+            <th>Notebook</th>
+            <th>Description</th>
+        </tr>
+
+        <tr>
+            <td>w05_model.ipynb</td>
+            <td>Random Forest model development, baseline comparison, and feature importance.</td>
+        </tr>
+
+        <tr>
+            <td>w06_validation_audit.ipynb</td>
+            <td>Grouped validation, leakage audit, error analysis, and honest claim review.</td>
+        </tr>
+
+        <tr>
+            <td>w07_action_playbook.ipynb</td>
+            <td>Ranked content recommendations, reason codes, monitoring, and human review guidance.</td>
+        </tr>
+
+        <tr>
+            <td>capstone.ipynb</td>
+            <td>Complete research paper and final project documentation.</td>
+        </tr>
+
+    </table>
+
+    <h3>Technology Stack</h3>
+
+    <ul>
+
+        <li>Python</li>
+
+        <li>Google Colab</li>
+
+        <li>DuckDB</li>
+
+        <li>Pandas</li>
+
+        <li>Scikit-learn</li>
+
+        <li>Hugging Face Datasets</li>
+
+        <li>GitHub</li>
+
+    </ul>
+
+    <h3>Reproducibility Notes</h3>
+
+    <p>
+        The notebooks can be executed from top to bottom using Google Colab.
+        Data is accessed directly from the FlyRank Hugging Face repository
+        through DuckDB without downloading the complete dataset.
+    </p>
+
+    <p>
+        Fixed random seeds were used where appropriate to improve the
+        reproducibility of reported model performance.
+    </p>
+
+</section>
+
+<!-- ========================= ACKNOWLEDGMENTS ========================= -->
+
+<section id="acknowledgments" class="paper-section">
+
+    <h2>Acknowledgments & Data Credit</h2>
+
+    <p>
+        This project was completed as part of the
+        <strong>FlyRank Machine Learning Internship</strong>.
+    </p>
+
+    <p>
+        The analysis was built using the
+        <strong>FlyRank ML Internship dataset</strong>, which provides
+        anonymized Google Search Console performance data for educational and
+        research purposes.
+    </p>
+
+    <p>
+        Special thanks to the FlyRank team for providing the dataset, project
+        structure, and learning resources that made this research possible.
+    </p>
+
+    <p>
+        <strong>Built on the FlyRank ML Internship dataset.</strong>
+    </p>
+
+    <p>
+        Data Source:
+        <a
+            href="https://flyrank.ai"
+            target="_blank"
+            rel="noopener noreferrer">
+            https://flyrank.ai
+        </a>
+    </p>
+
+</section>
+
+<!-- ========================= CONCLUSION ========================= -->
+
+<section id="conclusion" class="paper-section">
+
+    <h2>Conclusion</h2>
+
+    <p>
+        This research investigated whether Google Search Console performance
+        metrics can be used to identify content with a higher likelihood of
+        receiving search clicks. A Random Forest Classifier was developed,
+        evaluated against a rule-based baseline, and validated using grouped
+        client-based validation to provide a more realistic estimate of model
+        performance.
+    </p>
+
+    <p>
+        The results indicate that search impressions and search position provide
+        useful predictive information for identifying click opportunities within
+        the evaluated dataset. However, these findings should be interpreted as
+        <strong>observed</strong>, <strong>measured</strong>, and
+        <strong>directional</strong> evidence rather than proof of causal
+        relationships or future performance.
+    </p>
+
+    <p>
+        The resulting content action playbook converts model predictions into
+        practical recommendations that support SEO and content optimization
+        workflows while maintaining human oversight and careful claim language.
+    </p>
+
+    <p>
+        Future work may include additional search signals, longer historical
+        time windows, time-aware validation strategies, and more advanced
+        machine learning models to further strengthen the robustness of the
+        recommendations.
+    </p>
+
+</section>
+
+<footer>
+    <div class="footer-content">
+
+        <h3>Research Paper</h3>
+
+        <p>
+            Predicting Content Click Opportunities Using Google Search Console
+            Performance Data
+        </p>
+
+        <p>
+            Built as part of the <strong>FlyRank Machine Learning Internship (ML-11)</strong>.
+        </p>
+
+        <p>
+            Built on the
+            <a href="https://flyrank.ai" target="_blank">
+                FlyRank ML Internship dataset
+            </a>.
+        </p>
+
+        <p>
+            © 2026 Ahmed Ali. All rights reserved.
+        </p>
+
+        <div class="footer-links">
+
+            <a href="https://github.com/ahmedali2155/flyrank-ml-internship" target="_blank">
+                GitHub Repository
+            </a>
+
+            <span>•</span>
+
+            <a href="https://ahmedalii-portfolio.vercel.app" target="_blank">
+                Portfolio
+            </a>
+
+        </div>
+
+    </div>
+</footer>
+
+</div>
+
+</body>
+</html>
